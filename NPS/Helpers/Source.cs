@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 public class Source
 {
     public string uri;
-    public DatabaseType type;
+    private DatabaseType type;
 
-    public Source(string uri, DatabaseType type)
+    private Source(string uri, DatabaseType type)
     {
         this.uri = uri;
         this.type = type;

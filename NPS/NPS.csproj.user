@@ -10,4 +10,39 @@
     <FallbackCulture>en-US</FallbackCulture>
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Update="CompPack.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Desc.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Helpers\CustomComponents\CheckBoxComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Helpers\CustomComponents\ListViewEx.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Helpers\CustomComponents\Popup.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Helpers\CustomComponents\PopupComboBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Update="Library.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Options.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="RuForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="SyncDB.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Update.cs">
+      <SubType>Form</SubType>
+    </Compile>
+  </ItemGroup>
 </Project>

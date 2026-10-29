@@ -1,18 +1,22 @@
+using NPS.Helpers.IGDB;
+using SimpleJson;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using SimpleJson;
-using System.Globalization;
-using System.Security.Cryptography;
 using System.Xml;
-using System.Text.RegularExpressions;
+using System.Text.Json;
+using IGDB.Models;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace NPS
 {
@@ -31,6 +35,10 @@ namespace NPS
         HashSet<string> regions = new HashSet<string>();
         int currentOrderColumn = 0;
         bool currentOrderInverted = false;
+        string[] strScreenshot;
+        int intSSIndex = 0;
+        int intGameInfoIndex = 0;
+        GameData[] games;
 
         List<DownloadWorker> downloads = new List<DownloadWorker>();
         Release[] releases = null;
@@ -52,6 +60,7 @@ namespace NPS
             // jon: not hooked up to my repo yet, and this repo is unmaintained.
             // NewVersionCheck();
         }
+
 
         private void NoPayStationBrowser_Load(object sender, EventArgs e)
         {
@@ -379,17 +388,17 @@ namespace NPS
         {
             bool dirty = false;
             int searchEntryMatches = 0;
-            foreach( List<string> searchEntry in searchEntries )
+            foreach (List<string> searchEntry in searchEntries)
             {
                 dirty = false;
 
-                foreach( String searchTerm in searchEntry )
+                foreach (String searchTerm in searchEntry)
                 {
-                    if( searchTerm.Length == 0 ) continue;
-                    if( searchTerm.StartsWith( "-" ) )
+                    if (searchTerm.Length == 0) continue;
+                    if (searchTerm.StartsWith("-"))
                     {
 
-                        if( ( item.TitleName.ToLower().Contains( searchTerm.Substring( 1 ).ToLower() ) ) 
+                        if ((item.TitleName.ToLower().Contains(searchTerm.Substring(1).ToLower()))
                             // || ( item.ContentId.ToLower().Contains( searchTerm.Substring( 1 ).ToLower() ) ) // Causing a crash when the game doesn't have a ContentId
                             )
                         {
@@ -397,41 +406,41 @@ namespace NPS
                             break;
                         }
                     }
-                    else if( ( !item.TitleName.ToLower().Contains( searchTerm.ToLower() ) ) &&
-                        ( !item.TitleId.ToLower().Contains( searchTerm.ToLower() ) ) )
+                    else if ((!item.TitleName.ToLower().Contains(searchTerm.ToLower())) &&
+                        (!item.TitleId.ToLower().Contains(searchTerm.ToLower())))
                     {
                         dirty = true;
                     }
 
                 }
-                if( !dirty )
+                if (!dirty)
                 {
                     searchEntryMatches++;
                 }
             }
-            return (searchEntryMatches > 0 && searchEntries.Count > 0 );
+            return (searchEntryMatches > 0 && searchEntries.Count > 0);
         }
 
         private List<List<string>> parseSearchBar()
         {
             List<List<string>> searchEntries = new List<List<string>>();
 
-            string[] rawEntries = txtSearch.Text?.Split( "||".ToCharArray() );
-            foreach( string entry in rawEntries )
+            string[] rawEntries = txtSearch.Text?.Split("||".ToCharArray());
+            foreach (string entry in rawEntries)
             {
                 if (entry != "")
                 {
-	                List<string> searchTerms = new List<string>();
-	
-	                string[] rawTerms = entry?.Split( ' ' );
-	                foreach( string terms in rawTerms )
-	                {
-	                    if( terms != "" )
-	                    {
-	                        searchTerms.Add( terms );
-	                    }
-	                }
-	                searchEntries.Add( searchTerms );
+                    List<string> searchTerms = new List<string>();
+
+                    string[] rawTerms = entry?.Split(' ');
+                    foreach (string terms in rawTerms)
+                    {
+                        if (terms != "")
+                        {
+                            searchTerms.Add(terms);
+                        }
+                    }
+                    searchEntries.Add(searchTerms);
                 }
             }
             return searchEntries;
@@ -445,8 +454,8 @@ namespace NPS
 
             foreach (var item in currentDatabase)
             {
-                bool dirty =  searchEntries.Count != 0 && !itemMatchesSearchEntries(item, searchEntries);
- 
+                bool dirty = searchEntries.Count != 0 && !itemMatchesSearchEntries(item, searchEntries);
+
 
                 if (!dirty)
                 {
@@ -476,13 +485,13 @@ namespace NPS
                     }
                 }
 
-                if ((dirty == false) && 
-                    ContainsCmbBox(cmbRegion, item.Region) && 
+                if ((dirty == false) &&
+                    ContainsCmbBox(cmbRegion, item.Region) &&
                     ContainsCmbBox(cmbType, item.contentType)
                     )
                 /*(cmbRegion.Text == "ALL" || item.Region.Contains(cmbRegion.Text)))*/
                 {
-                    itms.Add( item );
+                    itms.Add(item);
                 }
             }
 
@@ -676,6 +685,7 @@ namespace NPS
         // lstTitles
         private void lstTitles_SelectedIndexChanged(object sender, EventArgs e)
         {
+            tESTToolStripMenuItem_Click_1(sender, e);
             if (lstTitles.SelectedItems.Count > 0)
             {
                 var itm = (lstTitles.SelectedItems[0].Tag as Item);
@@ -730,11 +740,11 @@ namespace NPS
 
         }
 
-        private void downloadAllWithPatchesToolStripMenuItem_Click( object sender, EventArgs e )
+        private void downloadAllWithPatchesToolStripMenuItem_Click(object sender, EventArgs e)
         {
 
-            btnDownload_Click( null, null );
-            downloadAllDlcsToolStripMenuItem_Click( null, null );
+            btnDownload_Click(null, null);
+            downloadAllDlcsToolStripMenuItem_Click(null, null);
             checkForPatchesAndDownload();
         }
 
@@ -1065,15 +1075,15 @@ namespace NPS
 
             if (lstTitles.SelectedItems.Count == 0) return;
 
-            foreach( var entry in lstTitles.SelectedItems )
+            foreach (var entry in lstTitles.SelectedItems)
             {
-                GamePatches gp = new GamePatches( lstTitles.SelectedItems[ 0 ].Tag as Item, ( item ) =>
+                GamePatches gp = new GamePatches(lstTitles.SelectedItems[0].Tag as Item, (item) =>
                 {
-                    DownloadWorker dw = new DownloadWorker( item, this );
-                    lstDownloadStatus.Items.Add( dw.lvi );
-                    lstDownloadStatus.AddEmbeddedControl( dw.progress, 3, lstDownloadStatus.Items.Count - 1 );
-                    downloads.Add( dw );
-                } );
+                    DownloadWorker dw = new DownloadWorker(item, this);
+                    lstDownloadStatus.Items.Add(dw.lvi);
+                    lstDownloadStatus.AddEmbeddedControl(dw.progress, 3, lstDownloadStatus.Items.Count - 1);
+                    downloads.Add(dw);
+                });
 
                 gp.AskForUpdate();
             }
@@ -1081,24 +1091,24 @@ namespace NPS
 
         private void checkForPatchesAndDownload()
         {
-            if( string.IsNullOrEmpty( Settings.Instance.HMACKey ) )
+            if (string.IsNullOrEmpty(Settings.Instance.HMACKey))
             {
-                MessageBox.Show( "No hmackey" );
+                MessageBox.Show("No hmackey");
                 return;
             }
 
-            if( lstTitles.SelectedItems.Count == 0 ) return;
+            if (lstTitles.SelectedItems.Count == 0) return;
 
 
-            foreach( var entry in lstTitles.SelectedItems )
+            foreach (var entry in lstTitles.SelectedItems)
             {
-                GamePatches gp = new GamePatches( lstTitles.SelectedItems[ 0 ].Tag as Item, ( item ) =>
+                GamePatches gp = new GamePatches(lstTitles.SelectedItems[0].Tag as Item, (item) =>
                 {
-                    DownloadWorker dw = new DownloadWorker( item, this );
-                    lstDownloadStatus.Items.Add( dw.lvi );
-                    lstDownloadStatus.AddEmbeddedControl( dw.progress, 3, lstDownloadStatus.Items.Count - 1 );
-                    downloads.Add( dw );
-                } );
+                    DownloadWorker dw = new DownloadWorker(item, this);
+                    lstDownloadStatus.Items.Add(dw.lvi);
+                    lstDownloadStatus.AddEmbeddedControl(dw.progress, 3, lstDownloadStatus.Items.Count - 1);
+                    downloads.Add(dw);
+                });
                 gp.DownloadUpdateNoAsk();
             }
         }
@@ -1222,6 +1232,176 @@ namespace NPS
                 }
             });
             cp.ShowDialog();
+        }
+
+        private void clearGameInfo()
+        {
+            intSSIndex = 0;
+            intGameInfoIndex = 0;
+            tbGameName.Text = "please wait...";
+            tbGameMode.Text = "";
+            tbSummary.Text = "";
+            tbGenres.Text = "";
+            tbPlatforms.Text = "";
+            imgCover.Image = null;
+            pbScreenshots.Image = null;
+        }
+
+        private async void tESTToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            clearGameInfo();
+            if ((Settings.Instance.TwitchClientId != null) && (Settings.Instance.TwitchClientSecret != null))
+            {
+                //var igdb = new IgdbService(
+                //Settings.Instance.TwitchClientId,
+                //Settings.Instance.TwitchClientSecret
+                //);
+                IgdbService igdb = new IgdbService("jl0kjqcxq8yn2mdwnng92aev3x8amd", "swwoszy6l1616vqqqy281ybm15qear");
+                // TEST random game lookup
+                string gameName = "";
+                string platform = "";
+                string region = "";
+                try
+                {
+                    gameName = ((NPS.Item)lstTitles.SelectedItems[0].ListView.FocusedItem.Tag).TitleName;
+                    platform = ((NPS.Item)lstTitles.SelectedItems[0].ListView.FocusedItem.Tag).contentType.ToLower();
+                    region = ((NPS.Item)lstTitles.SelectedItems[0].ListView.FocusedItem.Tag).Region.ToLower();
+                }
+                catch
+                {
+                    //MessageBox.Show("Please select a game prior to refreshing the game information.");
+                    return;
+                }
+                if (gameName.Contains("("))
+                {
+                                       gameName = gameName.Substring(0, gameName.IndexOf(" ("));
+                }
+                tbGameName.Text = gameName;
+
+                // TODO fix the platform and region
+                games = await igdb.LookupGameAsync(gameName, platform, region);
+                if (games != null && games.Length > 0)
+                {
+                    // BELOW IS FOR DEBUG PURPOSES. Leave in here but remove prior to launch.
+                    //string JSON = JsonSerializer.Serialize(games, new JsonSerializerOptions
+                    //{
+                    //    WriteIndented = true
+                    //});
+                    //File.WriteAllText("c:\\temp\\output.json", JSON);
+                    updateGameInfo();
+                }
+                else
+                {
+                    tbGameName.Text = "No game found in IGDB for: " + gameName;
+
+                }
+            }
+            else
+            {
+                MessageBox.Show("Missing IGDB/Twitch data in settings. Please update that information to continue. For more deatils on how to set this up, please review the documentation.", "No IGDB Login Info", MessageBoxButtons.OK);
+            }
+        }
+
+        private void bNextSS_Click(object sender, EventArgs e)
+        {
+            intSSIndex++;
+            if (intSSIndex >= strScreenshot.Length)
+            {
+                intSSIndex = 0;
+            }
+            //pbScreenshots.LoadAsync(strScreenshot[intSSIndex]);
+            updateGameInfo();
+        }
+
+        private void bPrevSS_Click(object sender, EventArgs e)
+        {
+            intSSIndex--;
+            if (intSSIndex < 0)
+            {
+                intSSIndex = strScreenshot.Length - 1;
+            }
+            //pbScreenshots.LoadAsync(strScreenshot[intSSIndex]);
+            updateGameInfo();
+
+        }
+
+        private void btnPrevInfo_Click(object sender, EventArgs e)
+        {
+            intGameInfoIndex--;
+            if (intGameInfoIndex < 0)
+            {
+                intGameInfoIndex = games.Length - 1;
+            }
+            updateGameInfo();
+
+        }
+        private void updateGameInfo()
+        {
+            tbGameMode.Text = "";
+            if (games[intGameInfoIndex].GameModes is not null)
+            {
+                foreach (GameModeData gameMode in games[intGameInfoIndex].GameModes)
+                {
+                    tbGameMode.Text += gameMode.Name + ", ";
+                }
+            }
+            tbSummary.Text = games[intGameInfoIndex].Summary;
+            tbGenres.Text = "";
+            if (games[intGameInfoIndex].Genres is not null)
+            {
+                foreach (GenreData genre in games[intGameInfoIndex].Genres)
+                {
+                    tbGenres.Text += genre.Name + ", ";
+                }
+            }
+            tbPlatforms.Text = "";
+            if (games[intGameInfoIndex].Platforms is not null)
+            {
+                foreach (PlatformData platform in games[intGameInfoIndex].Platforms)
+                {
+                    tbPlatforms.Text += platform.Name + ", ";
+                }
+            }
+            string coverURL = "https:" + games[intGameInfoIndex].Cover.Url;
+            imgCover.LoadAsync(coverURL);
+            if (games[intGameInfoIndex].Screenshots is not null)
+            {
+                strScreenshot = games[intGameInfoIndex].Screenshots.Select(s => "https:" + s.Url.Replace("t_thumb", "t_1080p")).ToArray();
+            }
+            else
+            {
+                strScreenshot = Array.Empty<string>();
+            }
+            if (strScreenshot.Length > 0)
+            {
+                pbScreenshots.LoadAsync(strScreenshot[intSSIndex]);
+            }
+            if (strScreenshot.Length == 0)
+            {
+                lScreenshotCount.Text = "No screenshots available";
+            }
+            else
+            {
+                lScreenshotCount.Text = "Screenshot " + (intSSIndex + 1) + " of " + strScreenshot.Length;
+            }
+            if (games.Length == 0)
+            {
+                lGameCount.Text = "No games found";
+            }
+            else
+            {
+                lGameCount.Text = "Game " + (intGameInfoIndex + 1) + " of " + games.Length;
+            }
+        }
+
+        private void btnNextInfo_Click(object sender, EventArgs e)
+        {
+            intGameInfoIndex++;
+            if (intGameInfoIndex >= games.Length)
+            {
+                intGameInfoIndex = 0;
+            }
+            updateGameInfo();
         }
     }
 

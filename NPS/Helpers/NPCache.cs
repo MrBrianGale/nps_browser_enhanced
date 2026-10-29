@@ -36,10 +36,19 @@ public class NPCache
         if (System.IO.File.Exists(path))
         {
             var stream = File.OpenRead(path);
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
             var formatter = new BinaryFormatter();
-            _i = (NPCache)formatter.Deserialize(stream);
-            if (_i.renasceneCache == null) _i.renasceneCache = new List<Renascene>();
-            stream.Close();
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
+            try
+            {
+                _i = (NPCache)formatter.Deserialize(stream);
+                if (_i.renasceneCache == null) _i.renasceneCache = new List<Renascene>();
+                stream.Close();
+            }
+            catch
+            {
+                _i = new NPCache(System.DateTime.MinValue);
+            }
         }
         else _i = new NPCache(System.DateTime.MinValue);
     }
@@ -57,7 +66,9 @@ public class NPCache
     public void Save()
     {
         FileStream stream = File.Create(path);
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
         var formatter = new BinaryFormatter();
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
         formatter.Serialize(stream, this);
         stream.Close();
     }

@@ -74,6 +74,10 @@ namespace NPS
                 tb_proxyServer.Text = Settings.Instance.proxy.Address.Host;
             }
 
+            // Twitch data
+            tb_TwitchClientId.Text = Settings.Instance.TwitchClientId;
+            tb_TwitchClientSecret.Text = Settings.Instance.TwitchClientSecret;
+
             lblCacheDate.Text = "Cache date: " + NPCache.I.UpdateDate.ToString();
         }
 
@@ -186,6 +190,10 @@ namespace NPS
                 Settings.Instance.Save();
                 if (needResync) mainForm.Sync(null);
             }
+
+            // IGDB settings
+            Settings.Instance.TwitchClientId = tb_TwitchClientId.Text;
+            Settings.Instance.TwitchClientSecret = tb_TwitchClientSecret.Text;
         }
 
         private void btn_psvuri_Click(object sender, EventArgs e)

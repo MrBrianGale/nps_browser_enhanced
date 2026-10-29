@@ -52,7 +52,7 @@ namespace NPS
 
         public WorkerStatus status { get; private set; }
         [System.NonSerialized]
-        Timer timer = new Timer();
+        System.Windows.Forms.Timer timer = new System.Windows.Forms.Timer();
         [System.NonSerialized]
         Form formCaller;
 
@@ -80,7 +80,7 @@ namespace NPS
             progress = new ProgressBar();
             if (progressValue > 100) progressValue = 100;
             progress.Value = progressValue;
-            timer = new Timer();
+            timer = new System.Windows.Forms.Timer();
             timer.Interval = 1000;
             timer.Tick += Timer_Tick;
             lvi.Tag = this;

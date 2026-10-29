@@ -49,12 +49,17 @@ public class Settings
         }
     }
 
+    public string TwitchClientSecret { get; internal set; }
+    public string TwitchClientId { get; internal set; }
+
     public static void Load()
     {
         if (System.IO.File.Exists(path))
         {
             var stream = File.OpenRead(path);
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
             var formatter = new BinaryFormatter();
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
             _i = (Settings)formatter.Deserialize(stream);
             stream.Close();
         }
@@ -72,7 +77,9 @@ public class Settings
     public void Save()
     {
         FileStream stream = File.Create(path);
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
         var formatter = new BinaryFormatter();
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
         formatter.Serialize(stream, this);
         stream.Close();
     }
@@ -80,7 +87,9 @@ public class Settings
     static History ImportOldHistory()
     {
         var stream = File.OpenRead("history.dat");
+#pragma warning disable SYSLIB0011 // Type or member is obsolete
         var formatter = new BinaryFormatter();
+#pragma warning restore SYSLIB0011 // Type or member is obsolete
         History h = (History)formatter.Deserialize(stream);
         stream.Close();
         return h;
