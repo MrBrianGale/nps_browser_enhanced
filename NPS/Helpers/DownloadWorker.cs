@@ -63,6 +63,7 @@ namespace NPS
             lvi.SubItems.Add("Waiting");
             lvi.SubItems.Add("");
             lvi.SubItems.Add("");
+            lvi.SubItems.Add("No Errors");
             lvi.Tag = this;
             //isRunning = false;
             //isCanceled = false;
@@ -272,6 +273,7 @@ namespace NPS
             if (status == WorkerStatus.Paused || status == WorkerStatus.DownloadError)
             {
                 lvi.SubItems[1].Text = "Queued";
+                lvi.SubItems[4].Text = "";
                 status = WorkerStatus.Queued;
             }
         }
@@ -572,7 +574,7 @@ namespace NPS
                 hwRq = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(urr);
                 hwRq.Proxy = Settings.Instance.proxy;
                 hwRes = (System.Net.HttpWebResponse)hwRq.GetResponse();
-                hwRes.Close();
+               // hwRes.Close();
 
                 long totalLength = hwRes.ContentLength;
                 totalSize = totalLength;
@@ -633,7 +635,8 @@ namespace NPS
                 {
                     this.Pause();
                     //MessageBox.Show("Unable to download \"" + currentDownload.TitleName + "\"." + Environment.NewLine + err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    lvi.SubItems[4].Text = "Unable to download due to error: " + err.Message;
+                    lvi.SubItems[4].Text = "Unable to download due to error: " + err.Message + ". MORE details. Source: " + sSourceURL +" Destination: "+ sDestinationPath;
+                    
                 }));
 
             }
