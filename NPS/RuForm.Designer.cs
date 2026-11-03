@@ -128,6 +128,7 @@ namespace NPS
             colDownloadSpeed = new ColumnHeader();
             colDownloadStatus = new ColumnHeader();
             colDownloadProgress = new ColumnHeader();
+            colDownloadError = new ColumnHeader();
             mnuMain.SuspendLayout();
             lstTitlesMenuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)ptbCover).BeginInit();
@@ -252,7 +253,7 @@ namespace NPS
             // tESTToolStripMenuItem
             // 
             tESTToolStripMenuItem.Name = "tESTToolStripMenuItem";
-            tESTToolStripMenuItem.Size = new Size(180, 22);
+            tESTToolStripMenuItem.Size = new Size(171, 22);
             tESTToolStripMenuItem.Text = "Refresh Game Info";
             tESTToolStripMenuItem.Click += tESTToolStripMenuItem_Click_1;
             // 
@@ -559,10 +560,7 @@ namespace NPS
             // 
             // splList.Panel2
             // 
-            splList.Panel2.Controls.Add(lGameCount);
-            splList.Panel2.Controls.Add(btnNextInfo);
             splList.Panel2.Controls.Add(groupBox1);
-            splList.Panel2.Controls.Add(btnPrevInfo);
             splList.Panel2.Controls.Add(rbnDownloaded);
             splList.Panel2.Controls.Add(rbnUndownloaded);
             splList.Panel2.Controls.Add(rbnAll);
@@ -697,7 +695,7 @@ namespace NPS
             // 
             lGameCount.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lGameCount.AutoSize = true;
-            lGameCount.Location = new Point(395, 374);
+            lGameCount.Location = new Point(1121, 9);
             lGameCount.Name = "lGameCount";
             lGameCount.Size = new Size(97, 15);
             lGameCount.TabIndex = 43;
@@ -706,7 +704,7 @@ namespace NPS
             // btnNextInfo
             // 
             btnNextInfo.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            btnNextInfo.Location = new Point(604, 374);
+            btnNextInfo.Location = new Point(1330, 5);
             btnNextInfo.Name = "btnNextInfo";
             btnNextInfo.Size = new Size(31, 23);
             btnNextInfo.TabIndex = 42;
@@ -734,7 +732,7 @@ namespace NPS
             groupBox1.Controls.Add(imgCover);
             groupBox1.Location = new Point(231, 3);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(410, 363);
+            groupBox1.Size = new Size(410, 414);
             groupBox1.TabIndex = 28;
             groupBox1.TabStop = false;
             groupBox1.Text = "Game Info";
@@ -743,7 +741,7 @@ namespace NPS
             // 
             lScreenshotCount.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lScreenshotCount.AutoSize = true;
-            lScreenshotCount.Location = new Point(164, 326);
+            lScreenshotCount.Location = new Point(164, 377);
             lScreenshotCount.Name = "lScreenshotCount";
             lScreenshotCount.Size = new Size(97, 15);
             lScreenshotCount.TabIndex = 41;
@@ -802,7 +800,7 @@ namespace NPS
             // bNextSS
             // 
             bNextSS.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
-            bNextSS.Location = new Point(373, 326);
+            bNextSS.Location = new Point(373, 377);
             bNextSS.Name = "bNextSS";
             bNextSS.Size = new Size(31, 23);
             bNextSS.TabIndex = 34;
@@ -813,7 +811,7 @@ namespace NPS
             // bPrevSS
             // 
             bPrevSS.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            bPrevSS.Location = new Point(6, 326);
+            bPrevSS.Location = new Point(6, 377);
             bPrevSS.Name = "bPrevSS";
             bPrevSS.Size = new Size(35, 23);
             bPrevSS.TabIndex = 33;
@@ -826,7 +824,7 @@ namespace NPS
             pbScreenshots.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             pbScreenshots.Location = new Point(9, 175);
             pbScreenshots.Name = "pbScreenshots";
-            pbScreenshots.Size = new Size(395, 147);
+            pbScreenshots.Size = new Size(395, 198);
             pbScreenshots.SizeMode = PictureBoxSizeMode.Zoom;
             pbScreenshots.TabIndex = 32;
             pbScreenshots.TabStop = false;
@@ -888,7 +886,7 @@ namespace NPS
             // btnPrevInfo
             // 
             btnPrevInfo.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            btnPrevInfo.Location = new Point(237, 374);
+            btnPrevInfo.Location = new Point(963, 5);
             btnPrevInfo.Name = "btnPrevInfo";
             btnPrevInfo.Size = new Size(35, 23);
             btnPrevInfo.TabIndex = 41;
@@ -982,8 +980,11 @@ namespace NPS
             // 
             // splitContainer1.Panel1
             // 
+            splitContainer1.Panel1.Controls.Add(lGameCount);
             splitContainer1.Panel1.Controls.Add(ResumeAll);
+            splitContainer1.Panel1.Controls.Add(btnNextInfo);
             splitContainer1.Panel1.Controls.Add(button5);
+            splitContainer1.Panel1.Controls.Add(btnPrevInfo);
             splitContainer1.Panel1.Controls.Add(PauseAll);
             splitContainer1.Panel1.Controls.Add(button4);
             splitContainer1.Panel1.Controls.Add(button3);
@@ -1079,7 +1080,7 @@ namespace NPS
             // 
             // lstDownloadStatus
             // 
-            lstDownloadStatus.Columns.AddRange(new ColumnHeader[] { colDownloadTitle, colDownloadSpeed, colDownloadStatus, colDownloadProgress });
+            lstDownloadStatus.Columns.AddRange(new ColumnHeader[] { colDownloadTitle, colDownloadSpeed, colDownloadStatus, colDownloadProgress, colDownloadError });
             lstDownloadStatus.Dock = DockStyle.Fill;
             lstDownloadStatus.FullRowSelect = true;
             lstDownloadStatus.Location = new Point(0, 0);
@@ -1109,6 +1110,11 @@ namespace NPS
             // 
             colDownloadProgress.Text = "Progress";
             colDownloadProgress.Width = 366;
+            // 
+            // colDownloadError
+            // 
+            colDownloadError.Text = "Error Message";
+            colDownloadError.Width = 200;
             // 
             // NPSBrowser
             // 
@@ -1146,6 +1152,7 @@ namespace NPS
             ((System.ComponentModel.ISupportInitialize)pbScreenshots).EndInit();
             ((System.ComponentModel.ISupportInitialize)imgCover).EndInit();
             splitContainer1.Panel1.ResumeLayout(false);
+            splitContainer1.Panel1.PerformLayout();
             splitContainer1.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)splitContainer1).EndInit();
             splitContainer1.ResumeLayout(false);
@@ -1259,5 +1266,6 @@ namespace NPS
         private Button btnPrevInfo;
         private Label lGameCount;
         private Label lScreenshotCount;
+        private ColumnHeader colDownloadError;
     }
 }

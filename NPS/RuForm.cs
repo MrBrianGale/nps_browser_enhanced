@@ -1245,6 +1245,9 @@ namespace NPS
             tbPlatforms.Text = "";
             imgCover.Image = null;
             pbScreenshots.Image = null;
+            lScreenshotCount.Text = "No screenshots available";
+            lGameCount.Text = "No games found";
+
         }
 
         private async void tESTToolStripMenuItem_Click_1(object sender, EventArgs e)
@@ -1338,6 +1341,11 @@ namespace NPS
         private void updateGameInfo()
         {
             tbGameMode.Text = "";
+            if (games is null || games.Count() == 0)
+            {
+                clearGameInfo();
+                return;
+            }
             if (games[intGameInfoIndex].GameModes is not null)
             {
                 foreach (GameModeData gameMode in games[intGameInfoIndex].GameModes)

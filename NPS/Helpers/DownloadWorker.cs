@@ -275,7 +275,11 @@ namespace NPS
                 status = WorkerStatus.Queued;
             }
         }
-        public string Pkg { get { return pkgOutputPath; } }
+        public string Pkg
+        {
+            get { return pkgOutputPath; }
+            set { pkgOutputPath = value; }
+        }
 
         public void DeletePkg()
         {
@@ -628,7 +632,8 @@ namespace NPS
                 formCaller.Invoke(new Action(() =>
                 {
                     this.Pause();
-                    MessageBox.Show("Unable to download \"" + currentDownload.TitleName + "\"." + Environment.NewLine + err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    //MessageBox.Show("Unable to download \"" + currentDownload.TitleName + "\"." + Environment.NewLine + err.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    lvi.SubItems[4].Text = "Unable to download due to error: " + err.Message;
                 }));
 
             }
